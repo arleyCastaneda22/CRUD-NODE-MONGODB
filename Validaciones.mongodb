@@ -1,0 +1,178 @@
+use("beautySoft");
+/* Estamos creando el esquema para las validaciones de la colección estilista*/
+// db.createCollection("estilista", {
+//     validator: {
+//        $jsonSchema: {
+//           bsonType: "object",
+//           title: "Validacion estilista",
+//           required: ["Id_estilista", "nombre", "apellido", "email"],
+//           properties: {
+//             Id_estilista: {
+//                 bsonType: "int",
+//                 description: "'Id_estilista' must be a int and is required"
+//              },
+//              nombre: {
+//                 bsonType: "string",
+//                 description: "'name' must be a string and is required"
+//              },
+//              apellido: {
+//                 bsonType: "string",
+//                 description: "'apelldo' must be a string and is required"
+//              },
+//              email: {
+//                 bsonType: "string",
+//                 description: "'email' debe ser una cadena y es obligatorio",
+//               },
+//               estado: {
+//                 bsonType: "string",
+//                 description: "'estado' debe ser una cadena y es obligatorio",
+//               }
+
+//           }
+//        }
+//     }
+//  } )
+/* Estamos creando el esquema para las validaciones de la colección servicios*/
+//  db.createCollection("servicios", {
+//    validator: {
+//       $jsonSchema: {
+//          bsonType: "object",
+//          title: "Validacion estilista",
+//          required: ["Id_servicio", "nombre_servicio", "duracion", "valor"],
+//          properties: {
+//            Id_servicio: {
+//                bsonType: "int",
+//                description: "'Id_servicio' must be a string and is required"
+//             },
+//             nombre_servicio: {
+//                bsonType: "string",
+//                description: "'name' must be a string and is required"
+//             },
+//             duracion: {
+//                bsonType: "date",
+//                description: "'apelldo' must be a string and is required"
+//             },
+//             valor: {
+//                bsonType: "int",
+//                description: "'valor' debe ser una cadena y es obligatorio",
+//              },
+//              estado: {
+//                bsonType: "string",
+//                description: "'estado' debe ser una cadena y es obligatorio",
+//              },
+//              Id_estilista: {
+//                 bsonType: "int",
+//                 description: "'Id_estilista' must be a int and is required"
+//             },
+//          }
+//       }
+//    }
+// } )
+
+//Estamos creando el esquema para las validaciones de la colección estilista
+// db.createCollection('citas',{
+//     validator:{
+//         $jsonSchema:{
+//             bsonType: "object",
+//             title:"Validación de la tabla citas",
+//             required: ["nombre", "apellido", "email", "fecha_y_hora"],
+//             properties:{
+//                 Id_cita: {
+//                     bsonType: "int",
+//                     description: "'Id_estilista' must be a int and is required"
+//                 },
+//                 nombre: {
+//                     bsonType: "string",
+//                      description: "'name' must be a string and is required"
+//                 },
+//                 apellido: {
+//                     bsonType: "string",
+//                     description: "'apelldo' must be a string and is required"
+//                 },
+//                 email: {
+//                     bsonType: "string",
+//                     description: "'email' debe ser una cadena y es obligatorio",
+//                 },
+//                 fecha_y_hora:{
+//                     bsonType: "date",
+//                     description: "'fecha_y_hora' debe ser un date y es obligatorio",
+
+//                 },
+//                 estado:{
+//                     bsonType:"string",
+//                     description: "'estado' debe ser una cadena y es obligatorio",
+//                 },
+//                 Id_estilista: {
+//                     bsonType: "int",
+//                     description: "'Id_estilista' must be a int and is required"
+//                 },
+//                 Id_servicio: {
+//                     bsonType: "int",
+//                     description: "'Id_servicio' must be a string and is required"
+//                 }
+//             }
+
+//         }
+//     }
+// })
+//Comando para eliminar una colección
+// db.citas.drop()
+//Comnado para contar los documentos de la colección estilista
+// db.estilista.find({}).count();
+// db.estilista.find({}).limit(3);
+
+// db.estilista.aggregate([
+//   {
+//     $match: {
+//       $and: [
+//         {
+//           nombre: /A/,
+//         },
+//         { apellido: /^L/ },
+//       ],
+//     },
+//   },
+// //   
+//   {
+//     $project: {
+//       nombre: true,
+//       apellido: true,
+//     },
+//   },
+//   {
+//     $limit: 2,
+//   },
+//   {
+//     $sort: {
+//       nombre: -1
+//     }
+//   }
+// ]);
+
+db.citas.aggregate([
+    {
+                $lookup: {
+                  from: "servicios", //es desde donde me traigo la informacion
+                  localField: "Id_servicio", //como se llama el id "donde me paro"
+                  foreignField: "Id_servicio",
+                  as: "servicios",
+                },
+              },
+              {
+                $unwind:'$servicios'
+              },
+              
+              {
+                $group: {
+                  _id: "$servicios.nombre_servicio",
+                    prome:{$avg:"$servicios.valor"}
+                  
+                }
+              },
+                  {
+        $project: {
+          "prome": true
+        },
+    },
+  
+])
